@@ -39,15 +39,15 @@ int main(int argc, char* argv[])
 		values.emplace_back(input);
 	}
 	std::sort(values.begin(), values.end());
-	size_t low = 0, high = values.size() - 1, mid = (high + low) / 2;
-	while (low != mid)
+	size_t low = 0, high = values.size() - 1;
+	while (low != high)
 	{
-		if (Compute(values[mid]) <= max)
-			low = mid;
-		else high = mid;
-		mid = (high + low) / 2;
+		size_t work = high - low, mid = low + work / 2 + (work % 2);
+		if (Compute(values[mid]) > max)
+			high = mid - 1;
+		else low = mid;
 	}
 
-	std::cout << std::format("Part 1: {}\nPart 2: {}\nPart 3: {}\n", Compute(values[values.size() / 2]), Compute(evens), values[mid]);
+	std::cout << std::format("Part 1: {}\nPart 2: {}\nPart 3: {}\n", Compute(values[values.size() / 2]), Compute(evens), values[low]);
 	return 0;
 }
