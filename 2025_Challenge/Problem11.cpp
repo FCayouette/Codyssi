@@ -11,7 +11,7 @@ constexpr int ToDecimalValue(char c)
 	return c - '0';
 }
 
-constexpr char ToBase68(i64 val)
+constexpr char ToBase68(char val)
 {
 	if (val < 10)
 		return '0' + val;
@@ -28,16 +28,6 @@ constexpr char ToBase68(i64 val)
 	case 66: return '%';
 	default: return '^';
 	}
-}
-constexpr int DigitsInBase(i64 val, i64 base)
-{
-	int result = 0;
-	while (val > 0)
-	{
-		++result;
-		val /= base;
-	}
-	return result;
 }
 
 int main(int argc, char* argv[])
@@ -66,11 +56,11 @@ int main(int argc, char* argv[])
 		result1 = std::max(val, result1);
 	}
 	
-	result3 = (i64)std::ceil(std::sqrt(std::sqrt((double)total)));
+	result3 = (i64)std::ceil(std::sqrt(std::sqrt((double)total+1)));
 	while (total > 0ll)
 	{
 		auto dq = std::div(total, 68ll);
-		result2 += ToBase68(dq.rem);
+		result2 += ToBase68((char)dq.rem);
 		total = dq.quot;
 	}
 	std::reverse(result2.begin(), result2.end());
