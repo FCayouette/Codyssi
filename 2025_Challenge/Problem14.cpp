@@ -51,7 +51,7 @@ int main(int argc, char* argv[])
 	auto start = std::chrono::high_resolution_clock::now();
 	if (argc < 2)
 	{
-		std::cout << "Usage: ProblemXX.exe inputFilename\n";
+		std::cout << "Usage: Problem14.exe inputFilename\n";
 		return -1;
 	}
 	std::ifstream in(argv[1]);
@@ -61,11 +61,10 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	i64 result1 = 0, result2 = 0, result3 = 0;
-	int n, q, c, u;
+	int result1, q, c, u;
 	std::string _;
 	std::vector<Material> work;
-	while (in >> n >> _ >> _ >> _ >> _ >> q >>_ >> _ >> _ >> c >> _ >> _ >> _ >> _ >> u)
+	while (in >> _ >> _ >> _ >> _ >> _ >> q >>_ >> _ >> _ >> c >> _ >> _ >> _ >> _ >> u)
 		work.emplace_back(q, c, u);
 	
 	std::sort(ALL(work), std::greater());
@@ -75,21 +74,17 @@ int main(int argc, char* argv[])
 	if (l.quality > r.quality) return true; if (l.quality < r.quality) return false; return l.unique < r.unique; });
 	std::array<Combination, 301> combinations;
 	for (int i = 1; i < combinations.size(); ++i)
-	{
-		Combination best;
 		for (int m = 0; m < work.size() && work[m].cost <= i; ++m)
 		{
 			Combination c(work[m], m);
-			if (c.BetterThan(best))
-				best = c;
+			if (c.BetterThan(combinations[i]))
+				combinations[i] = c;
 			for (int left = 1; left <= i - c.cost; ++left)
 				if (c.Disjoint(combinations[left]))
-					if (Combination m = combinations[left].Merge(c); m.BetterThan(best))
-						best = m;
+					if (Combination m = combinations[left].Merge(c); m.BetterThan(combinations[i]))
+						combinations[i] = m;
 		}
-		combinations[i] = best;
-	}
-
+	
 	std::cout << std::format("Part 1: {}\nPart 2: {}\nPart 3: {}\n", result1, combinations[30].quality * combinations[30].unique, combinations[300].quality * combinations[300].unique);
 	std::cout << std::format("Duration: {}\n", std::chrono::duration_cast<std::chrono::microseconds>(std::chrono::high_resolution_clock::now() - start));
 	return 0;
