@@ -1,13 +1,5 @@
 import std;
 
-#define ALL(x) (x).begin(),(x).end()
-#define ALLc(x) (x).cbegin(),(x).cend()
-#define ALLr(x) (x).rbegin(),(x).rend()
-#define ALLcr() (x).crbegin(),(x).crend()
-
-using u64 = unsigned long long;
-using i64 = long long;
-
 struct Material
 {
 	int quality = {}, cost = {}, unique = {};
@@ -67,9 +59,9 @@ int main(int argc, char* argv[])
 	while (in >> _ >> _ >> _ >> _ >> _ >> q >>_ >> _ >> _ >> c >> _ >> _ >> _ >> _ >> u)
 		work.emplace_back(q, c, u);
 	
-	std::sort(ALL(work), std::greater());
+	std::sort(work.begin(), work.end(), std::greater());
 	result1 = std::accumulate(work.cbegin(), work.cbegin() + 5, 0, [](int t, const Material& m) {return t + m.unique; });
-	std::sort(ALL(work), [](const Material& l, const Material& r)
+	std::sort(work.begin(), work.end(), [](const Material& l, const Material& r)
 		{ if (l.cost < r.cost) return true; if (l.cost > r.cost) return false;
 	if (l.quality > r.quality) return true; if (l.quality < r.quality) return false; return l.unique < r.unique; });
 	std::array<Combination, 301> combinations;
@@ -79,10 +71,13 @@ int main(int argc, char* argv[])
 			Combination c(work[m], m);
 			if (c.BetterThan(combinations[i]))
 				combinations[i] = c;
-			for (int left = 1; left <= i - c.cost; ++left)
+			for (int left = i - c.cost; left; --left)
+			{
+				if (c.quality + combinations[left].quality < combinations[i].quality) break;
 				if (c.Disjoint(combinations[left]))
 					if (Combination m = combinations[left].Merge(c); m.BetterThan(combinations[i]))
-						combinations[i] = m;
+						combinations[i] = std::move(m);
+			}
 		}
 	
 	std::cout << std::format("Part 1: {}\nPart 2: {}\nPart 3: {}\n", result1, combinations[30].quality * combinations[30].unique, combinations[300].quality * combinations[300].unique);
