@@ -102,6 +102,70 @@ public:
 		return *this;
 	}
 
+	BigInt operator -(const BigInt& r) const
+	{
+		if (r >= *this) // No support for negative
+			return { "0" };
+		
+		std::vector<char> result;
+		result.reserve(decimalRep.size());
+		bool borrow = false;
+		size_t index = 0;
+		while (borrow || index < r.decimalRep.size())
+		{
+			if (char rChar = index < r.decimalRep.size() ? r.decimalRep[index] : 0;
+				rChar + borrow > decimalRep[index])
+			{
+				result.push_back(decimalRep[index] + 10 - (rChar + borrow));
+				borrow = true;
+			}
+			else
+			{
+				result.push_back(decimalRep[index] - (rChar + borrow));
+				borrow = false;
+			}
+			++index;
+		}
+		while (index < decimalRep.size())
+			result.push_back(decimalRep[index++]);
+		while (result.back() == 0)
+			result.pop_back();
+
+		return BigInt(std::move(result));
+	}
+
+	BigInt& operator-=(const BigInt& r)
+	{
+		if (r >= *this) // No support for negative
+		{
+			decimalRep.clear();
+			decimalRep.push_back(0);
+			return *this;
+		}
+
+		bool borrow = false;
+		size_t index = 0;
+		while (borrow || index < r.decimalRep.size())
+		{
+			char rChar = index < r.decimalRep.size() ? r.decimalRep[index] : 0;
+			if (rChar + borrow > decimalRep[index])
+			{
+				decimalRep[index] = decimalRep[index] + 10 - (rChar + borrow);
+				borrow = true;
+			}
+			else
+			{
+				decimalRep[index] -= (rChar + borrow);
+				borrow = false;
+			}
+			++index;
+		}
+		while (decimalRep.back() == 0)
+			decimalRep.pop_back();
+
+		return *this;
+	}
+
 	BigInt operator*(const BigInt& r) const
 	{
 		return BigInt(std::move(InternalMul(r.decimalRep)));
